@@ -1,0 +1,144 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+.mainContainer {
+  min-height: 100vh;
+  background-color: #5d2a42;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.containerForm {
+  width: 500px;
+  height: 500px;
+  margin: 0 12px;
+
+  background-color: #fff;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 5px;
+
+  -webkit-box-shadow: 10px 10px 5px -6px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 10px 10px 5px -6px rgba(0, 0, 0, 0.75);
+  box-shadow: 10px 10px 5px -6px rgba(0, 0, 0, 0.75);
+}
+
+.containerForm__header {
+}
+
+.containerForm__title {
+  color: #5d2a42;
+}
+
+.containerForm__title {
+  font-size: 45px;
+  text-align: center;
+}
+
+.containerForm__body {
+  width: 100%;
+}
+
+.form {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form--search {
+  display: flex;
+  align-items: center;
+}
+
+.formGroup {
+  width: 100%;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.formGroup--search {
+  width: 100%;
+  margin-bottom: 0;
+}
+.formGroup--button {
+  width: 15%;
+  margin-bottom: 0;
+}
+
+.formGroup__label {
+  font-size: 25px;
+  transition: 0.3s color;
+}
+
+.formGroup__input {
+  padding: 12px;
+  font-size: 18px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  border-radius: 5px;
+
+  border: 2.8px solid #4f4f50;
+  transition: 0.3s border-color, 0.3s box-shadow;
+}
+
+.formGroup__input:focus {
+  border-color: #5d2a42;
+  -webkit-box-shadow: 0px 0px 25px -6px #5d2a42;
+  -moz-box-shadow: 0px 0px 25px -6px #5d2a42;
+  box-shadow: 0px 0px 25px -6px #5d2a42;
+}
+
+.formGroup__input:focus + .formGroup__label {
+  color: #5d2a42;
+  text-shadow: 0px 0px 17px #5d2a42;
+}
+
+.formGroup__messageError {
+  height: 20px;
+  color: #f8001d;
+}
+
+.formGroup__button {
+  outline: none;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  background-color: #5d2a42;
+  color: #fff;
+
+  border: none;
+  border-radius: 5px;
+  font-size: 25px;
+
+  transition-property: background-color;
+  transition-duration: 0.3s;
+}
+
+.formGroup__button:hover {
+  background-color: #fb6376;
+}
+
+.formGroup__button--search {
+  width: 15%;
+}
+
+.formGroup__button--search:hover {
+  background-color: transparent;
+  color: #fff;
+}
+
+.containerForm__footer {
+  text-align: center;
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/main.css">
+    <title>OMDB</title>
+</head>
+
+<body id="body">
+    <div class="" id="loading"></div>
+
+    <div class="container-movies" id="containerMovies">
+
+        <header class="header">
+            <div class="header__element header__element--favorites">
+                <a href="#" class="header__link" id="favoriteButton">Favorites</a>
+            </div>
+            <div class="header__element header__element--search">
+                <form class="form form--search" id="formSearch">
+
+                    <div class="formGroup formGroup--search">
+                        <input type="text" class="formGroup__input" placeholder="Movies or series">
+
+                        <input type="hidden" id="searchHidden" class="" value="robot">
+                        <button class="formGroup__button formGroup__button--search">
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="header__element header__element--logOut">
+                <a href="./index.html" class="header__link">Log Out</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="movies" id="movies">
+
+            </div>
+
+            <nav class="paginator">
+                <ul class="paginator__items">
+                    <li class="paginator__first"></li>
+                    <li class="paginator__prev" id="prev"></li>
+                    <li class="paginator__count">
+                        <span id="currentPage" class="paginator__currentPage">1</span>
+                        <span class="paginator__slash">/</span>
+                        <span id="numPages" class="paginator__numPages"></span>
+                    </li>
+                    <li class="paginator__next" id="next"></li>
+                    <li class="paginator__last"></li>
+
+                </ul>
+            </nav>
+        </main>
+
+    </div>
+
+    <div class="container-movies hide transparent" id="favorites">
+        <div class="header">
+            <a href="#" class="header__link" id="returnToSearch">Return</a>
+        </div>
+
+        <div class="movies movies--favorites" id="favoritesMovies"></div>
+
+    </div>
+
+    <div class="modal-info" id="modal">
+        <div class="modal-info__content">
+
+            <div class="modal-info__head">
+                <h2 class="modal-info__title">More info.</h2>
+            </div>
+
+            <div class="modal-info__body">
+
+                <div class="modal-info__div">
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Title: </span>
+                        <span class="modal-info__text" id="infoTitle"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Year: </span>
+                        <span class="modal-info__text" id="infoYear"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Rated: </span>
+                        <span class="modal-info__text" id="infoRated"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Released: </span>
+                        <span class="modal-info__text" id="infoReleased"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Runtime: </span>
+                        <span class="modal-info__text" id="infoRuntime"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Genre: </span>
+                        <span class="modal-info__text" id="infoGenre">r</span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Director: </span>
+                        <span class="modal-info__text" id="infoDirector"> </span>
+                    </div>
+
+
+
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Language: </span>
+                        <span class="modal-info__text" id="infoLanguage"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Country: </span>
+                        <span class="modal-info__text" id="infoCountry"></span>
+                    </div>
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Awards: </span>
+                        <span class="modal-info__text" id="infoAwards"></span>
+                    </div>
+                </div>
+
+
+                <div class="modal-info__div">
+
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Actors: </span>
+                        <span class="modal-info__text" id="infoActors"></span>
+                    </div>
+
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Plot: </span>
+                        <span class="modal-info__text" id="infoPlot"></span>
+                    </div>
+
+                    <div class="modal-info__item">
+                        <span class="modal-info__label">Writer: </span>
+                        <span class="modal-info__text" id="infoWriter"></span>
+                    </div>
+
+                    <div class="modal-info__item">
+                        <table class="modal-info__table">
+                            <caption class="modal-info__label modal-info__label--caption">Ratings</caption>
+                            <thead class="modal-info__thead">
+                                <tr class="modal-info__tr">
+                                    <th class="modal-info__th">Source</th>
+                                    <th class="modal-info__th">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="modal-info__tbody" id="infoRatings">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script type="module" src="js/script.js"></script>
+</body>
+
+</html>
