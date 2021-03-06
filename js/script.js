@@ -1,4 +1,4 @@
-import { generateUserkey, currentUser, createUser } from './user.js';
+import { generateUserkey, currentUser } from './user.js';
 
 const apiKey = 'e04d870c';
 const $movies = document.getElementById('movies');
@@ -14,15 +14,7 @@ const $favoriteButton = document.getElementById('favoriteButton');
 
 const $favoritesMovies = document.getElementById('favoritesMovies');
 
-document.addEventListener('DOMContentLoaded', () => {
 
-    validateUser();
-    drawMovies('movies', 'robot');
-    paginator();
-    disabledPaginatorButton();
-    showHideFavorites();
-
-});
 
 const validateUser = () => {
     if (!sessionStorage.getItem('login')) {
@@ -40,65 +32,6 @@ const requestSingleData = id => {
         .then(response => response.json());
 };
 
-
-$formSearch.addEventListener('submit', e => {
-    e.preventDefault();
-
-    const searchValue = e.currentTarget.firstElementChild.firstElementChild.value;
-    $searchMoviesHidden.value = searchValue;
-
-    if (searchValue.trim() && searchValue.length > 3) {
-
-
-        $currentPage.textContent = 1;
-        disabledPaginatorButton();
-
-        drawMovies('movies', searchValue);
-    }
-});
-
-$movies.addEventListener('click', e => {
-    removeOrAddFavorite(e);
-    if (!e.target.classList.contains('card-movie__favorite') && !e.target.classList.contains('card-movie__chk')) {
-        if (e.target.classList.toString().includes('card-movie')) {
-
-            const jsonMovieInfo = JSON.parse(e.target.closest('.card-movie').firstElementChild.textContent);
-            $modal.classList.add('modal-info--show');
-            body.style = 'overflow:hidden';
-
-            drawInfoMovieserie(jsonMovieInfo);
-
-        }
-
-    }
-});
-
-document.addEventListener('click', e => {
-    if (e.target.id === 'modal') {
-        $modal.classList.remove('modal-info--show')
-        body.style = 'overflow:""';
-
-    };
-});
-
-$favoritesMovies.addEventListener('click', e => {
-    if (
-        e.target.classList.contains('card-movie__heart')
-        && removeOrAddFavorite(e) === 'deleted'
-    )
-        e.target.parentElement.parentElement.parentElement.parentElement.remove();
-
-    if (!e.target.classList.contains('card-movie__favorite') && !e.target.classList.contains('card-movie__chk')) {
-        if (e.target.classList.toString().includes('card-movie')) {
-
-            const jsonMovieInfo = JSON.parse(e.target.closest('.card-movie').firstElementChild.textContent);
-            $modal.classList.add('modal-info--show');
-            drawInfoMovieserie(jsonMovieInfo);
-
-        }
-
-    }
-});
 
 
 const removeOrAddFavorite = event => {
@@ -444,6 +377,77 @@ const showHideFavorites = () => {
         }, 320);
     });
 };
+
+
+$formSearch.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const searchValue = e.currentTarget.firstElementChild.firstElementChild.value;
+    $searchMoviesHidden.value = searchValue;
+
+    if (searchValue.trim() && searchValue.length > 3) {
+
+
+        $currentPage.textContent = 1;
+        disabledPaginatorButton();
+
+        drawMovies('movies', searchValue);
+    }
+});
+
+$movies.addEventListener('click', e => {
+    removeOrAddFavorite(e);
+    if (!e.target.classList.contains('card-movie__favorite') && !e.target.classList.contains('card-movie__chk')) {
+        if (e.target.classList.toString().includes('card-movie')) {
+
+            const jsonMovieInfo = JSON.parse(e.target.closest('.card-movie').firstElementChild.textContent);
+            $modal.classList.add('modal-info--show');
+            body.style = 'overflow:hidden';
+
+            drawInfoMovieserie(jsonMovieInfo);
+
+        }
+
+    }
+});
+
+document.addEventListener('click', e => {
+    if (e.target.id === 'modal') {
+        $modal.classList.remove('modal-info--show')
+        body.style = 'overflow:""';
+
+    };
+});
+
+$favoritesMovies.addEventListener('click', e => {
+    if (
+        e.target.classList.contains('card-movie__heart')
+        && removeOrAddFavorite(e) === 'deleted'
+    )
+        e.target.parentElement.parentElement.parentElement.parentElement.remove();
+
+    if (!e.target.classList.contains('card-movie__favorite') && !e.target.classList.contains('card-movie__chk')) {
+        if (e.target.classList.toString().includes('card-movie')) {
+
+            const jsonMovieInfo = JSON.parse(e.target.closest('.card-movie').firstElementChild.textContent);
+            $modal.classList.add('modal-info--show');
+            drawInfoMovieserie(jsonMovieInfo);
+
+        }
+
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    validateUser();
+    drawMovies('movies', 'robot');
+    paginator();
+    disabledPaginatorButton();
+    showHideFavorites();
+
+});
+
 
 
 
