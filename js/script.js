@@ -1,4 +1,4 @@
-import { generateUserkey, currentUser } from './user.js';
+import { generateUserkey, currentUser, validateUser } from './user.js';
 
 const apiKey = 'e04d870c';
 const $movies = document.getElementById('movies');
@@ -9,31 +9,76 @@ const $currentPage = document.getElementById('currentPage');
 const $numPages = document.getElementById('numPages');
 const $searchMoviesHidden = document.getElementById('searchHidden');
 const $modal = document.getElementById('modal');
+const $modalContent = document.getElementById('modalContent');
 
 const $favoriteButton = document.getElementById('favoriteButton');
 
 const $favoritesMovies = document.getElementById('favoritesMovies');
 
 
-
-const validateUser = () => {
-    if (!sessionStorage.getItem('login')) {
-        window.location.href = '../index.html';
-    }
-};
-
+//Retorna todos los resultados encontrados por la API de acuerdo a las palabras claves suministradas y de acuerdo a que página se indique, ya que el API suministra resultados de a 10.
 const requestAllData = (keyWords, numPage) => {
     return fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${keyWords}&page=${numPage}`)
         .then(response => response.json());
 };
 
+
+//Retorna toda la información de una pelicula o serie de acuerdo a un id.
 const requestSingleData = id => {
     return fetch(`http://www.omdbapi.com/?apikey=${apiKey}&i=${id}`)
         .then(response => response.json());
 };
 
 
+//Agrega imdbID al localStorage de acuerdo al usuario actual.
+const addFavorite = imdbId => {
 
+    const userToUpdate = currentUser();
+
+    const userId = generateUserkey(userToUpdate.name, userToUpdate.password);
+    const favoritesCurrentUser = userToUpdate.favorites;
+
+    if (!favoritesCurrentUser.includes(imdbId)) favoritesCurrentUser.push(imdbId);
+
+    const users = JSON.parse(localStorage.getItem('usersOMDB'));
+    const indexUserToUpdate = users.findIndex(user => Object.keys(user)[0] === userId);
+    userToUpdate.favorites = favoritesCurrentUser;
+
+    const finalUser = {};
+    finalUser[userId] = userToUpdate;
+
+    users.splice(indexUserToUpdate, 1, finalUser);
+
+    localStorage.setItem('usersOMDB', JSON.stringify(users));
+
+};
+
+//Remueve favorito del localStorage
+const removeFavorite = imdbId => {
+
+    const userToUpdate = currentUser();
+    const userId = generateUserkey(userToUpdate.name, userToUpdate.password);
+    const favoritesCurrentUser = userToUpdate.favorites;
+
+    const indexFavorite = favoritesCurrentUser.findIndex(favoriteId => favoriteId === imdbId);
+
+    favoritesCurrentUser.splice(indexFavorite, 1);
+
+    userToUpdate.favorites = favoritesCurrentUser;
+
+    const users = JSON.parse(localStorage.getItem('usersOMDB'));
+    const indexUserToUpdate = users.findIndex(user => Object.keys(user)[0] === userId);
+
+    const finalUser = {};
+    finalUser[userId] = userToUpdate;
+
+    users.splice(indexUserToUpdate, 1, finalUser);
+
+    localStorage.setItem('usersOMDB', JSON.stringify(users));
+};
+
+
+//Para que remueva o agregue la moviserie de favoritos del DOM.
 const removeOrAddFavorite = event => {
 
     if (event.target.classList.contains('card-movie__heart')) {
@@ -44,7 +89,7 @@ const removeOrAddFavorite = event => {
                 removeFavorite(imdbId);
                 return 'deleted';
             } else {
-                event.preventDefault();//Not disabled check 
+                event.preventDefault();//Para que no se deshabilite el checkbox.
             }
         } else {
             addFavorite(imdbId);
@@ -54,86 +99,25 @@ const removeOrAddFavorite = event => {
 };
 
 
-const drawMovies = async (containerElementId, keyWords, numPage) => {
+const onLoadingPag = () => {
 
-    const containerElement = document.getElementById(containerElementId)
-    const moviesFragment = document.createDocumentFragment();
-
-    onLoadingPag();
-    const foundMovies = await requestAllData(keyWords, numPage);
-
-    if (foundMovies.Response === 'True') {
-        resultsFragment(foundMovies.totalResults);
-
-        let cont = 0;
-        for (const movie of foundMovies.Search) {
-            cont++;
-            const allDataMovie = await requestSingleData(movie.imdbID);
-            moviesFragment.appendChild(createMovie(allDataMovie, cont, 'n'));
-        }
-        containerElement.innerHTML = '';
-        containerElement.appendChild(moviesFragment);
-        disabledPaginatorButton();
-
-    } else {
-        alert('Not found...');
-    }
-    loadingFinish();
-};
-
-const drawInfoMovieserie = movie => {
-
-    const $infoTitle = document.getElementById('infoTitle');
-    const $infoYear = document.getElementById('infoYear');
-    const $infoRated = document.getElementById('infoRated');
-    const $infoReleased = document.getElementById('infoReleased');
-    const $infoRuntime = document.getElementById('infoRuntime');
-    const $infoGenre = document.getElementById('infoGenre');
-    const $infoDirector = document.getElementById('infoDirector');
-    const $infoWriter = document.getElementById('infoWriter');
-    const $infoActors = document.getElementById('infoActors');
-    const $infoPlot = document.getElementById('infoPlot');
-    const $infoAwards = document.getElementById('infoAwards');
-    const $infoRatings = document.getElementById('infoRatings');
-
-    $infoTitle.textContent = movie.Title;
-    $infoYear.textContent = movie.Year;
-    $infoRated.textContent = movie.Rated;
-    $infoReleased.textContent = movie.Released;
-    $infoRuntime.textContent = movie.Runtime;
-    $infoGenre.textContent = movie.Genre;
-    $infoDirector.textContent = movie.Director;
-    $infoWriter.textContent = movie.Writer;
-    $infoActors.textContent = movie.Actors;
-    $infoPlot.textContent = movie.Plot;
-    $infoAwards.textContent = movie.Awards;
-
-
-    const ratings = document.createDocumentFragment();
-    movie.Ratings.forEach(rating => {
-        const trRating = document.createElement('TR');
-        trRating.classList.add('modal-info__tr');
-        const tdRatingSource = document.createElement('TD');
-        const tdRatingSValue = document.createElement('TD');
-        tdRatingSource.classList.add('modal-info__td');
-        tdRatingSValue.classList.add('modal-info__td');
-
-        tdRatingSource.textContent = rating.Source;
-        tdRatingSValue.textContent = rating.Value;
-
-        trRating.append(tdRatingSource, tdRatingSValue);
-
-        ratings.appendChild(trRating);
-    });
-
-    $infoRatings.innerHTML = '';
-    $infoRatings.appendChild(ratings);
+    loading.classList.add('loading');
+    body.style = 'overflow:hidden';
 
 };
 
+//Agrega al input $numPages que esta oculto el numero de paginas de la busqueda realizada
+const resultsFragment = (totalResults) => {
 
+    const numPages = Math.ceil(totalResults / 10);
+    $numPages.textContent = numPages;
+
+};
+
+//Retorna boolean para saber si la movieserie esta agregada a favoritos
 const isFavorite = imdbId => currentUser().favorites.includes(imdbId);
 
+//Retorna un card con la informacion de la movieserie
 const createMovie = (movie, cont, is_favorite) => {
 
     const elementAllDatMovie = document.createElement('SPAN');
@@ -199,68 +183,13 @@ const createMovie = (movie, cont, is_favorite) => {
 
     movieTransparent.append(cardHeader, cardBody, cardFooter);
 
-
     cardMovie.append(elementAllDatMovie, movieImg, movieTransparent);
 
     return cardMovie;
 
 };
 
-const resultsFragment = (totalResults) => {
-
-    const numPages = Math.ceil(totalResults / 10);
-    $numPages.textContent = numPages;
-
-};
-
-
-
-const addFavorite = imdbId => {
-
-    const userToUpdate = currentUser();
-    const userId = generateUserkey(userToUpdate.name, userToUpdate.password);
-    const favoritescurrentUser = userToUpdate.favorites;
-
-    if (!favoritescurrentUser.includes(imdbId)) favoritescurrentUser.push(imdbId);
-
-
-    userToUpdate.favorites = favoritescurrentUser;
-    localStorage.setItem(userId, JSON.stringify(userToUpdate));
-
-};
-
-const removeFavorite = imdbId => {
-
-    const userToUpdate = currentUser();
-    const userId = generateUserkey(userToUpdate.name, userToUpdate.password);
-    const favoritescurrentUser = userToUpdate.favorites;
-
-
-    const indexFavorite = favoritescurrentUser.findIndex(favoriteId => favoriteId === imdbId);
-
-    favoritescurrentUser.splice(indexFavorite, 1);
-
-    userToUpdate.favorites = favoritescurrentUser;
-    localStorage.setItem(userId, JSON.stringify(userToUpdate));
-};
-
-
-const changePage = direction => {
-
-    let currentPage = parseInt($currentPage.textContent);
-    const numPages = parseInt($numPages.textContent);
-
-    if (direction == 'prev') {
-        currentPage--;
-        $currentPage.textContent = currentPage;
-
-    } else {
-
-        currentPage++;
-        $currentPage.textContent = currentPage;
-    }
-};
-
+//Al momento de paginar si se llega a la primera o última página se deshabilitara un boton.
 const disabledPaginatorButton = () => {
     if ($currentPage.textContent == 1) {
         $prevPagination.classList.add('paginator__item--disabled');
@@ -280,6 +209,109 @@ const disabledPaginatorButton = () => {
         $nextPagination.id = 'next';
     }
 };
+
+
+const loadingFinish = () => {
+    loading.classList.remove('loading');
+    body.style = 'overflow:""';
+};
+
+
+//Cada que el usuario ralice una busqueda se ejecutará esta función.
+const drawMovies = async (containerElementId, keyWords, numPage) => {
+
+    const containerElement = document.getElementById(containerElementId)
+    const moviesFragment = document.createDocumentFragment();
+
+    onLoadingPag();
+    const foundMovies = await requestAllData(keyWords, numPage);
+
+    if (foundMovies.Response === 'True') {
+        resultsFragment(foundMovies.totalResults);
+
+        let cont = 0;
+        for (const movie of foundMovies.Search) {
+            cont++;
+            const allDataMovie = await requestSingleData(movie.imdbID);
+            moviesFragment.appendChild(createMovie(allDataMovie, cont, 'n'));
+        }
+        containerElement.innerHTML = '';
+        containerElement.appendChild(moviesFragment);
+        disabledPaginatorButton();
+
+    } else {
+        alert('Not found...');
+    }
+    loadingFinish();
+};
+
+//Informaicon que se pinta en el modal de cada movieserie cunado se le da click.
+const drawInfoMovieserie = movie => {
+
+    const $infoTitle = document.getElementById('infoTitle');
+    const $infoYear = document.getElementById('infoYear');
+    const $infoRated = document.getElementById('infoRated');
+    const $infoReleased = document.getElementById('infoReleased');
+    const $infoRuntime = document.getElementById('infoRuntime');
+    const $infoGenre = document.getElementById('infoGenre');
+    const $infoDirector = document.getElementById('infoDirector');
+    const $infoWriter = document.getElementById('infoWriter');
+    const $infoActors = document.getElementById('infoActors');
+    const $infoPlot = document.getElementById('infoPlot');
+    const $infoAwards = document.getElementById('infoAwards');
+    const $infoRatings = document.getElementById('infoRatings');
+
+    $infoTitle.textContent = movie.Title;
+    $infoYear.textContent = movie.Year;
+    $infoRated.textContent = movie.Rated;
+    $infoReleased.textContent = movie.Released;
+    $infoRuntime.textContent = movie.Runtime;
+    $infoGenre.textContent = movie.Genre;
+    $infoDirector.textContent = movie.Director;
+    $infoWriter.textContent = movie.Writer;
+    $infoActors.textContent = movie.Actors;
+    $infoPlot.textContent = movie.Plot;
+    $infoAwards.textContent = movie.Awards;
+
+
+    const ratings = document.createDocumentFragment();
+    movie.Ratings.forEach(rating => {
+        const trRating = document.createElement('TR');
+        trRating.classList.add('modal-info__tr');
+        const tdRatingSource = document.createElement('TD');
+        const tdRatingSValue = document.createElement('TD');
+        tdRatingSource.classList.add('modal-info__td');
+        tdRatingSValue.classList.add('modal-info__td');
+
+        tdRatingSource.textContent = rating.Source;
+        tdRatingSValue.textContent = rating.Value;
+
+        trRating.append(tdRatingSource, tdRatingSValue);
+
+        ratings.appendChild(trRating);
+    });
+
+    $infoRatings.innerHTML = '';
+    $infoRatings.appendChild(ratings);
+
+};
+
+const changePage = direction => {
+
+    let currentPage = parseInt($currentPage.textContent);
+    const numPages = parseInt($numPages.textContent);
+
+    if (direction == 'prev') {
+        currentPage--;
+        $currentPage.textContent = currentPage;
+
+    } else {
+
+        currentPage++;
+        $currentPage.textContent = currentPage;
+    }
+};
+
 
 const paginator = () => {
 
@@ -308,22 +340,10 @@ const paginator = () => {
     });
 }
 
-const onLoadingPag = () => {
-
-    loading.classList.add('loading');
-    body.style = 'overflow:hidden';
-
-};
-
-const loadingFinish = () => {
-    loading.classList.remove('loading');
-    body.style = 'overflow:""';
-};
-
+//Ocultar o mostrar favoritos
 const showHideFavorites = () => {
 
     $favoriteButton.addEventListener('click', async () => {
-
 
         const movies = [];
 
@@ -331,7 +351,6 @@ const showHideFavorites = () => {
         let cont = 1;
         for (const imdbId of currentUser().favorites) {
             const movie = await requestSingleData(imdbId);
-
 
             movies.push(movie);
             fragment.appendChild(createMovie(movie, cont, 'f'));
@@ -343,7 +362,6 @@ const showHideFavorites = () => {
 
             $favoritesMovies.innerHTML = '';
             $favoritesMovies.appendChild(fragment);
-
 
             containerMovies.classList.add('transparent');
 
@@ -378,7 +396,7 @@ const showHideFavorites = () => {
     });
 };
 
-
+//Cuando se realiza una busqueda
 $formSearch.addEventListener('submit', e => {
     e.preventDefault();
 
@@ -395,6 +413,7 @@ $formSearch.addEventListener('submit', e => {
     }
 });
 
+//Capturar el target para abrir el modal.
 $movies.addEventListener('click', e => {
     removeOrAddFavorite(e);
     if (!e.target.classList.contains('card-movie__favorite') && !e.target.classList.contains('card-movie__chk')) {
@@ -402,23 +421,16 @@ $movies.addEventListener('click', e => {
 
             const jsonMovieInfo = JSON.parse(e.target.closest('.card-movie').firstElementChild.textContent);
             $modal.classList.add('modal-info--show');
+            $modalContent.classList.add('modal-info__content--show');
             body.style = 'overflow:hidden';
 
             drawInfoMovieserie(jsonMovieInfo);
-
         }
-
     }
 });
 
-document.addEventListener('click', e => {
-    if (e.target.id === 'modal') {
-        $modal.classList.remove('modal-info--show')
-        body.style = 'overflow:""';
 
-    };
-});
-
+//Remover favoritos del dom
 $favoritesMovies.addEventListener('click', e => {
     if (
         e.target.classList.contains('card-movie__heart')
@@ -431,11 +443,23 @@ $favoritesMovies.addEventListener('click', e => {
 
             const jsonMovieInfo = JSON.parse(e.target.closest('.card-movie').firstElementChild.textContent);
             $modal.classList.add('modal-info--show');
+            $modalContent.classList.add('modal-info__content--show');
             drawInfoMovieserie(jsonMovieInfo);
 
         }
 
     }
+});
+
+
+//Cerrar modal
+document.addEventListener('click', e => {
+    if (e.target.id === 'modal') {
+        $modal.classList.remove('modal-info--show');
+        $modalContent.classList.remove('modal-info__content--show');
+        body.style = 'overflow:""';
+
+    };
 });
 
 document.addEventListener('DOMContentLoaded', () => {

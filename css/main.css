@@ -320,12 +320,14 @@ body {
   justify-content: center;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, .6);
+  background-color: rgba(0, 0, 0, 0.4);
 
   transform: scale(0);
-  transition: transform .3s;
   z-index: 20;
+}
 
+.modal-info--show{
+  transform: scale(1);
 }
 
 .modal-info__content{
@@ -334,12 +336,16 @@ body {
   height: 80vh;
   padding: .8rem;
   border-radius: 5px;
-
+  transform: scale(0);
+  transition: transform .3s ease-in-out;
 }
 
-.modal-info--show{
+.modal-info__content--show{
   transform: scale(1);
+
 }
+
+
 
 .modal-info__head{
   width: 100%;
